@@ -21,7 +21,12 @@ void abrir_y_leer_archivo(char *arr, string nombre_archivo, int largo){
 }
 
 /*emparejar bases. Matrices*/
-void compara_bases(char prin, char sec){
+void compara_bases(char *prin, char *sec){
+    int i = 0;
+    while (prin[i] != 0 && sec[i] != 0)
+    {
+        i++;
+    }
     
 }
 
