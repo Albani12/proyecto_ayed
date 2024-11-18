@@ -10,6 +10,10 @@ using namespace std;
 void abrir_y_leer_archivo(char *arr, string nombre_archivo){
     ifstream archivo;
     archivo.open(nombre_archivo);
+    while (/* condition */)
+    {
+        /* code */
+    }
     
 }
 
