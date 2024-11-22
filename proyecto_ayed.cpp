@@ -6,7 +6,7 @@ using namespace std;
 const int MAX_LARGO = 100;
 
 /*abrir archivos y crear arreglos*/
-int abrir_y_leer_archivo(char *arr, string nombre_archivo){
+int abrir_y_leer_archivo(char *arr, string nombre_archivo, int largo){
     ifstream archivo(nombre_archivo); //abre archivo
     if (!archivo.is_open()) { //control de errores si es que no se abre el archivo
         cerr << "Error: No se pudo abrir el archivo " << nombre_archivo << endl;
@@ -15,7 +15,7 @@ int abrir_y_leer_archivo(char *arr, string nombre_archivo){
 
     int i = 0;
     //lee el archvivo caracter por caracter, maximo tamaño de 1000
-    while (archivo >> arr[i] && i < 100)  { 
+    while (archivo >> arr[i] && i < largo)  { 
         i++;
     }
     archivo.close(); //se cierra el archivo despues de leer
@@ -37,33 +37,27 @@ int abrir_y_leer_archivo(char *arr, string nombre_archivo){
     
 // }
 
+//valida que tamanos de los arreglos sean mayores a cero
+void validar_tamanos(int m, int n){
+    if (m == 0 || n == 0) {
+        cerr << "Error: No se pudieron leer las secuencias." << endl;
+    }    
+}
 
 /*emparejar bases, compara. Matrices*/
 //implementacion de Needleman-Wunsch *
-void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_archivo, int gap){
+void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_archivo, int gap, int largo){
     //leer las secuencias desde los archivos
-    int m = abrir_y_leer_archivo(prin, primer_archivo);
-    int n = abrir_y_leer_archivo(sec, segundo_archivo);
+    /*crea el arreglo con la cadena de cada uno de los archivos y devuelve sus tamanos*/
+    int m = abrir_y_leer_archivo(prin, primer_archivo, largo);
+    int n = abrir_y_leer_archivo(sec, segundo_archivo, largo);
+    validar_tamanos(m,n); // valida que los tamanos no sean 0 (osea que exista algo en el archivo)
 
-    if (m == 0 || n == 0) {
-        cerr << "Error: No se pudieron leer las secuencias." << endl;
-        return;
-    }
-        int mayor;
-    if (m > n)
-    {
-        mayor = m;
-    }
-    else
-    {
-        mayor = n;
-    }
-
-    //int mayor = max(m, n); //determina la longitud maxima
-    int matriz[100][100] = {0}; //se crea la matriz estarica
+    int mayor = max(m, n); //determina la longitud maxima
+    int matriz[m+1][n+1] = {0}; //se crea la matriz estatica
 
     //parametros del algoritmo
-    int match = 1; //Match: Si las bases actuales son iguales "coinden"
+    int match = 1; //Match: Si las bases actuales son iguales "coinciden"
     int mismatch = -1; //Mismatch: Si las bases son diferentes "no coinciden"
     //Gap: Si se introduce un espacio (gap) para alinear
 
@@ -88,13 +82,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
             } else {
                 diagonal = matriz[i-1][j-1] + mismatch;
             } //hice lo mismo pero definiendo diagonal arriba
-            // if (prin[i] == sec[i]) {
-            //     int diagonal = matriz[i-1][j-1] + match;
-            // }
-            // else
-            // {
-            //     int diagonal = matriz[i-1][j-1] + mismatch;
-            // }
+            
             matriz[i][j]= max(diagonal, max(arriba, izq));
             //maximo valor de las opciones posibles
             
@@ -103,11 +91,19 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     }
     //ahora imprime la matriz de puntuaciones
     cout << "Matriz de puntuaciones: " << endl;
-    for (int i = 0; i <=m; i++) {
+    cout << "           ";
+    for (int i = 0; i < m; i++)
+    {
+        cout << prin[i] << "    ";
+    }
+    cout << endl;
+    cout << "      ";
+    for (int i = 0; i <= n; i++) {
         for (int j = 0; j <= n; j++) {
-            cout << matriz [i][j]<< "\t";
+            cout << matriz [i][j]<< "   ";
         }
-        cout << endl;
+        cout << "\n";
+        cout << "  " << sec[i] << "  ";
     }
 
     //ahora la reconstruccion del alineamiento desde la matriz
@@ -178,6 +174,8 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
 }
 
 
+
+
 int main(int argc, char const *argv[]) {
     /*inicializar arreglos*/
     const int largo = 100;
@@ -188,14 +186,9 @@ int main(int argc, char const *argv[]) {
     //lee secuencias desde archivos
     string archivo_principal = "secuencia1.txt";
     string archivo_secundaria = "secuencia2.txt";
-    int m = abrir_y_leer_archivo(principal, archivo_principal);
-    int n = abrir_y_leer_archivo(secundaria, archivo_secundaria);
+    compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo);
 
-    if (m == 0 || n == 0) {
-        cerr << "Error: No se pudieron leer las secuencias." << endl;
-        return 0;
-    }
-    compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap);
+
     // int i = 0;
     // string nombre = "prueba.txt";
     // int largo_real = abrir_y_leer_archivo(principal, nombre);
@@ -205,6 +198,6 @@ int main(int argc, char const *argv[]) {
     //     i++;
     // }
     // cout << endl;
-
+    return 0;
     
 }
