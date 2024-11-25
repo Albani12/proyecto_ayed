@@ -109,50 +109,50 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     cout << endl;
 }
 
-void alinear(char* prin, char* sec, int* matriz, int m, int n, int match, int mismatch, int gap){
-    char alineamiento1[m]; //secuencia1 alineada
-    char alineamiento2[n]; //secuencia2 alineada
+// void alinear(char* prin, char* sec, int m, int n, int** matriz, int match, int mismatch, int gap){
+//     char alineamiento1[m + n + 1]; //secuencia1 alineada
+//     char alineamiento2[m + n + 1]; //secuencia2 alineada
 
-    //ahora la reconstruccion del alineamiento desde la matriz
-    int posicion = n + m + 1; //variable de seguimiento de posicion actual. Corresponde a la ultima posicion del arreglo y ahi comienza
-    // se compara la matriz para el alineamiento
-    int i = m;
-    int j = n;
-    int h = max(m,n);
+//     //ahora la reconstruccion del alineamiento desde la matriz
+//     int posicion = n + m + 1; //variable de seguimiento de posicion actual. Corresponde a la ultima posicion del arreglo y ahi comienza
+//     // se compara la matriz para el alineamiento
+//     int i = m;
+//     int j = n;
+//     int h = max(m,n);
 
-    while (i > 0 || j > 0)
-    {
-        if (matriz[i + 1][j + 1] == matriz[i-1][j-1] + match) { //coincidencia
-            if (prin[i-1] == sec[j-1]) {
-                alineamiento1[h] = prin[i-1] + alineamiento1;
-                alineamiento2[h] = sec[j-1] + alineamiento2;
-                i--;
-                j--;
-            }
+//     while (i > 0 || j > 0)
+//     {
+//         if (matriz[i + 1][j + 1] == matriz[i-1][j-1] + match) { //coincidencia
+//             if (prin[i-1] == sec[j-1]) {
+//                 alineamiento1[h] = prin[i-1] + alineamiento1;
+//                 alineamiento2[h] = sec[j-1] + alineamiento2;
+//                 i--;
+//                 j--;
+//             }
 
-        } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
-            if (prin[i-1] != sec[j-1]) {
-                alineamiento1[h] = prin[i-1] + alineamiento1;
-                alineamiento2[h] = sec[j-1] + alineamiento2;
-                i--;
-                j--;
-            }
+//         } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
+//             if (prin[i-1] != sec[j-1]) {
+//                 alineamiento1[h] = prin[i-1] + alineamiento1;
+//                 alineamiento2[h] = sec[j-1] + alineamiento2;
+//                 i--;
+//                 j--;
+//             }
 
-        } else if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
-            alineamiento1[h] = prin[i-1] + alineamiento1;
-            alineamiento2[h] = '-' + alineamiento2;
-            i--;
+//         } else if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
+//             alineamiento1[h] = prin[i-1] + alineamiento1;
+//             alineamiento2[h] = '-' + alineamiento2;
+//             i--;
 
-        } else { //gap en la primera secuencia
-            alineamiento1[h] = '-' + alineamiento1;
-            alineamiento2[h] = sec[j-1] + alineamiento2;
-            j--;
-        }
-        h--
-    }
+//         } else { //gap en la primera secuencia
+//             alineamiento1[h] = '-' + alineamiento1;
+//             alineamiento2[h] = sec[j-1] + alineamiento2;
+//             j--;
+//         }
+//         h--
+//     }
     
 
-}
+// }
 
 
 
