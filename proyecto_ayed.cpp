@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 const int MAX_LARGO = 100;
@@ -53,7 +54,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     int n = abrir_y_leer_archivo(sec, segundo_archivo, largo);
     validar_tamanos(m,n); // valida que los tamanos no sean 0 (osea que exista algo en el archivo)
 
-    int mayor = max(m, n); //determina la longitud maxima
+    int mayor = max(m + 1, n + 1); //determina la longitud maxima
     int matriz[m+1][n+1] = {0}; //se crea la matriz estatica
 
     //parametros del algoritmo
@@ -64,7 +65,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     //ahora inicializa la primera fila y columna de la matriz
     for (int i = 0; i <= m; i++) {
         matriz[i][0] = i*gap;     //*gap porq la primera fila y columna va con negativos 
-        //matriz[0][i] = -i;      
+         
     }
     for (int j = 0; j <= n; j++) {
         matriz[0][j] = j*gap;
@@ -94,85 +95,99 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     cout << "           ";
     for (int i = 0; i < m; i++)
     {
-        cout << prin[i] << "    ";
+        cout << sec[i] << "     ";
     }
     cout << endl;
     cout << "      ";
-    for (int i = 0; i <= n; i++) {
+    for (int i = 0; i <= m; i++) {
         for (int j = 0; j <= n; j++) {
-            cout << matriz [i][j]<< "   ";
+            cout << matriz [i][j]<< "    ";
         }
         cout << "\n";
-        cout << "  " << sec[i] << "  ";
+        cout << "  " << prin[i] << "  ";
     }
+    cout << endl;
+}
+
+void alinear(char* prin, char* sec, int* matriz, int m, int n, int match, int mismatch, int gap){
+    char alineamiento1[m]; //secuencia1 alineada
+    char alineamiento2[n]; //secuencia2 alineada
 
     //ahora la reconstruccion del alineamiento desde la matriz
-    string alineamiento1 = ""; //secuencia1 alineada
-    string alineamiento2 = ""; //secuencia2 alineada
-    int posicion = 199; //variable de seguimiento de posicion actual 
-    //199 corresponde a la ultima posicion del arreglo y ahi comienza
-
+    int posicion = n + m + 1; //variable de seguimiento de posicion actual. Corresponde a la ultima posicion del arreglo y ahi comienza
+    // se compara la matriz para el alineamiento
     int i = m;
     int j = n;
+    int h = max(m,n);
 
-    //para generar la imagen en graphiz
-    ofstream archivo_dot("alineamiento.dot");
-    archivo_dot << "digraph Alineamiento {" << endl;
-    archivo_dot << "rankdir=LR;" << endl;
-    int nodo_id = 0;
-
-    //se compara la matriz para el alineamiento
-    while (i > 0 || j > 0) {
-
-        if (matriz[i][j] == matriz[i-1][j-1] + match) { //coincidencia
+    while (i > 0 || j > 0)
+    {
+        if (matriz[i + 1][j + 1] == matriz[i-1][j-1] + match) { //coincidencia
             if (prin[i-1] == sec[j-1]) {
-                alineamiento1 = prin[i-1] + alineamiento1;
-                alineamiento2 = sec[j-1] + alineamiento2;
+                alineamiento1[h] = prin[i-1] + alineamiento1;
+                alineamiento2[h] = sec[j-1] + alineamiento2;
                 i--;
                 j--;
             }
 
         } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
             if (prin[i-1] != sec[j-1]) {
-                alineamiento1 = prin[i-1] + alineamiento1;
-                alineamiento2 = sec[j-1] + alineamiento2;
+                alineamiento1[h] = prin[i-1] + alineamiento1;
+                alineamiento2[h] = sec[j-1] + alineamiento2;
                 i--;
                 j--;
             }
 
         } else if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
-            alineamiento1 = prin[i-1] + alineamiento1;
-            alineamiento2 = '-' + alineamiento2;
+            alineamiento1[h] = prin[i-1] + alineamiento1;
+            alineamiento2[h] = '-' + alineamiento2;
             i--;
 
         } else { //gap en la primera secuencia
-            alineamiento1 = '-' + alineamiento1;
-            alineamiento2 = sec[j-1] + alineamiento2;
+            alineamiento1[h] = '-' + alineamiento1;
+            alineamiento2[h] = sec[j-1] + alineamiento2;
             j--;
         }
+        h--
     }
+    
 
-    while (i > 0) {
-        alineamiento1 = prin[i-1] + alineamiento1;
-        alineamiento2 = '-' + alineamiento2;
-        i--;
-    }
-
-    while (j > 0) {
-        alineamiento1 = '-' + alineamiento1;
-        alineamiento2 = sec[j - 1] + alineamiento2;
-        j--;
-    }
-
-    cout << "Alineamiento1: " << alineamiento1 << endl;
-    cout << "ALineamiento2: " << alineamiento2 << endl;
-
-    //deberia generar la imagen
-    //no son las mismas lineas de codigo para windows o linux :)
-    system("dot -Tpng alineamiento.dot -o alineamiento.png");
-    system("start alineamiento.png");
 }
 
+
+
+//     
+
+//     int i = m;
+//     int j = n;
+//     //para generar la imagen en graphiz
+//     ofstream archivo_dot("alineamiento.dot");
+//     archivo_dot << "digraph Alineamiento {" << endl;
+//     archivo_dot << "rankdir=LR;" << endl;
+//     int nodo_id = 0;
+
+//     //se compara la matriz para el alineamiento
+
+//     while (i > 0) {
+//         alineamiento1 = prin[i-1] + alineamiento1;
+//         alineamiento2 = '-' + alineamiento2;
+//         i--;
+//     }
+
+//     while (j > 0) {
+//         alineamiento1 = '-' + alineamiento1;
+//         alineamiento2 = sec[j - 1] + alineamiento2;
+//         j--;
+//     }
+
+//     cout << "Alineamiento1: " << alineamiento1 << endl;
+//     cout << "ALineamiento2: " << alineamiento2 << endl;
+
+//     //deberia generar la imagen
+//     //no son las mismas lineas de codigo para windows o linux :)
+//     system("dot -Tpng alineamiento.dot -o alineamiento.png");
+//     system("start alineamiento.png");
+//}
 
 
 
@@ -188,16 +203,6 @@ int main(int argc, char const *argv[]) {
     string archivo_secundaria = "secuencia2.txt";
     compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo);
 
-
-    // int i = 0;
-    // string nombre = "prueba.txt";
-    // int largo_real = abrir_y_leer_archivo(principal, nombre);
-    // while (principal[i] != 0)
-    // {
-    //     cout << " " << principal[i];
-    //     i++;
-    // }
-    // cout << endl;
     return 0;
     
 }
