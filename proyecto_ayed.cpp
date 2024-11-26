@@ -2,94 +2,133 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <sstream>
+//lo que tenga *DF* significa Descomentarlo al Final, es para que se agreguen los archivos de matriz y valor de penalidad
+//si se dejan ahora en cada ejecucion hay que poner los parametros y es mas tedioso
 
 using namespace std;
-//const int MAX_LARGO = 1000;
+const int MAX_LARGO = 1000; //tamaño maximo de secuencias
+//const int MAX_MATRIZ = 100; // tamaño máximo de la matriz *DF*
 
 /*abrir archivos y crear arreglos*/
+//Funcion para abrir y leer un archivo, almacenando su contenido en un arreglo
 int abrir_y_leer_archivo(char *arr, string nombre_archivo, int largo){
     ifstream archivo(nombre_archivo); //abre archivo
-    if (!archivo.is_open()) { //control de errores si es que no se abre el archivo
+    if (!archivo.is_open()) { //verifica si ek arhcivo abre correctamente
         cerr << "Error: No se pudo abrir el archivo " << nombre_archivo << endl;
         return 0;
     }
 
-    int i = 0;
-    //lee el archvivo caracter por caracter, maximo tamaño de 1000
+    int i = 0; //contador para la longitud de secuencia
+    //lee el archvivo caracter por caracter, maximo tamaño de 1000 
+    //o el final del archivo
     while (archivo >> arr[i] && i < largo)  { 
-        i++;
+        i++; //se increment el contador
     }
     archivo.close(); //se cierra el archivo despues de leer
     arr[i] = '\0'; //termina la cadena
-    return i; //long de la secuencia leida
+    return i; //longitud de la secuencia leida
 }
+
+// Función para cargar la matriz de emparejamiento y el valor V *DF*
+// void cargar_matriz_y_valor(const string& archivo_matriz, int matriz[MAX_MATRIZ][MAX_MATRIZ], int& valorV) {
+//     ifstream file(archivo_matriz);
+//     string line;
+
+//     if (file.is_open()) {
+//         // Leer el valor V
+//         file >> valorV;
+
+//         // Leer la matriz
+//         for (int i = 0; i < MAX_MATRIZ; i++) {
+//             for (int j = 0; j < MAX_MATRIZ; j++) {
+//                 if (!(file >> matriz[i][j])) {
+//                     matriz[i][j] = 0; // Asignar 0 si no se puede leer más
+//                 }
+//             }
+//         }
+//         file.close();
+//     } else {
+//         cerr << "Error al abrir el archivo de matriz." << endl;
+//     }
+// }
+
+
     
 //valida que tamanos de los arreglos sean mayores a cero
+//funcion para validar que las longitudes de las secuencias sean mayores a 0
 void validar_tamanos(int m, int n){
     if (m == 0 || n == 0) {
         cerr << "Error: No se pudieron leer las secuencias." << endl;
     }    
 }
 
-/*emparejar bases, compara. Matrices*/
-//implementacion de Needleman-Wunsch *
+//Funcion principal que implementa el algoritmo de Needleman-Wunsch
 void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_archivo, int gap, int largo){
     //leer las secuencias desde los archivos
     /*crea el arreglo con la cadena de cada uno de los archivos y devuelve sus tamanos*/
+
     int m = abrir_y_leer_archivo(prin, primer_archivo, largo);
     int n = abrir_y_leer_archivo(sec, segundo_archivo, largo);
     validar_tamanos(m,n); // valida que los tamanos no sean 0 (osea que exista algo en el archivo)
 
-    int mayor = max(m + 1, n + 1); //determina la longitud maxima
-    int matriz[100][100] = {0}; //se crea la matriz estatica
+    //int matriz[MAX_LARGO+1][MAX_LARGO+1] = {0}; //se crea la matriz estatica
+    //se crea la matriz estatica para almacenar las puntuaciones
+    int matriz[100][100] = {0}; 
 
-    //parametros del algoritmo
+    //Parámetros del algoritmo
     int match = 1; //Match: Si las bases actuales son iguales "coinciden"
     int mismatch = -1; //Mismatch: Si las bases son diferentes "no coinciden"
-    //Gap: Si se introduce un espacio (gap) para alinear
 
-    //ahora inicializa la primera fila y columna de la matriz
+    //Ahora inicializa la primera fila y columna de la matriz
     for (int i = 0; i <= m; i++) {
-        matriz[i][0] = i*gap;     //*gap porq la primera fila y columna va con negativos    
+        matriz[i][0] = i*gap;     //*gap porq la primera fila y columna va con negativos, se rellena la primera columna con gaps
     }
 
     for (int j = 0; j <= n; j++) {
-        matriz[0][j] = j*gap;
+        matriz[0][j] = j*gap; //rellena la primera fila con gaps
     }
 
-    //ahora se llena la matriz
-    for (int i = 1; i < mayor; i++) {
-        for (int j = 1; j < mayor; j++) {
+    //Llena la matriz
+    for (int i = 1; i <= m; i++) { //itera sobre filas
+        for (int j = 1; j <= n; j++) { //itera sobre columnas
+
             int arriba = matriz[i-1][j] + gap;
+            //costo de introducir un gap en la segunda secuencia
+
             int izq = matriz[i][j-1] + gap;
-            int diagonal;
-            //compara las bases para ver si coincide o no
+            //costo de introducir un gap en la primera secuencia
+
+            int diagonal; 
+            //la variable almacena el costo de coindicencia o no
+
+            //compara las bases actuales para ver si coincide o no
             if (prin[i-1] == sec[j-1]) {
-                diagonal = matriz [i-1][j-1] + match;
+                diagonal = matriz [i-1][j-1] + match; //coinciden
             } else {
-                diagonal = matriz[i-1][j-1] + mismatch;
-            } //hice lo mismo pero definiendo diagonal arriba
+                diagonal = matriz[i-1][j-1] + mismatch; //no coinciden
+            }
             
             matriz[i][j]= max(diagonal, max(arriba, izq));
-            //maximo valor de las opciones posibles
+            //almacena maximo valor de las 3 opciones posibles
             
         }
         
     }
-    //ahora imprime la matriz de puntuaciones
+    //Se imprime la matriz de puntuaciones
     cout << "Matriz de puntuaciones:\n " << endl; 
     cout << "           ";
 
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < m; i++) { 
         cout << sec[i] << "     ";
     }
 
     cout << endl;
     cout << "      ";
 
-    for (int i = 0; i <= m; i++) {
-        for (int j = 0; j <= n; j++) {
-            cout << matriz [i][j]<< "    ";
+    for (int i = 0; i <= m; i++) { //itera sobre filas
+        for (int j = 0; j <= n; j++) { //itera sobre columnas
+            cout << matriz [i][j]<< "    "; //imprime cada valor de la matriz
         }
         cout << "\n";
         cout << "  " << prin[i] << "  ";
@@ -102,80 +141,131 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
 
     string alineamiento1 = ""; //secuencia1 alineada
     string alineamiento2 = ""; //secuencia2 alineada
-//     //int posicion = 199; //variable de seguimiento de posicion actual 
-//     //199 corresponde a la ultima posicion del arreglo y ahi comienza
-
-//     //ahora la reconstruccion del alineamiento desde la matriz
-// //  int posicion = n + m + 1; //variable de seguimiento de posicion actual. Corresponde a la ultima posicion del arreglo y ahi comienza
-//      // se compara la matriz para el alineamiento
 
     int i = m;
     int j = n;
 
-// //   int h = max(m,n);
+    //int posicion = 199; //variable de seguimiento de posicion actual 
+    //199 corresponde a la ultima posicion del arreglo y ahi comienza
 
-//     // //para generar la imagen en graphiz
-//     // ofstream archivo_dot("alineamiento.dot");
-//     // if (!archivo_dot.is_open()) {
-//     //     cerr << "Error al crear el archivo .dot" << endl;
-//     // } else {
-//     //     cout << "El archivo .dot se ha creado correctamente." << endl;
-//     // }
-//     // archivo_dot << "digraph Alineamiento {" << endl;
-//     // archivo_dot << "rankdir=LR;" << endl;
-//     // int nodo_id = 0;
+    while (i > 0 || j > 0) { //Mientras hayan caracteres en alguna de las secuencias
 
-//     //se compara la matriz para el alineamiento
-    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0) { //si hay caracteres en ambas secuencias
 
-        if (matriz[i][j] == matriz[i-1][j-1] + match) { //coincidencia
-            if (prin[i-1] == sec[j-1]) {
-                alineamiento1 = prin[i-1] + alineamiento1;
-                alineamiento2 = sec[j-1] + alineamiento2;
-                i--;
-                j--;
+            //verifica si la puntuacion proviene de una coincidencia 
+            if (matriz[i][j] == matriz[i-1][j-1] + match) { //coincidencia
+                    alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+                    alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
+                    i--;
+                    j--; //se disminuyen los indices de las secuencias
+
+            //Verifica si la puntuacion proviene de una no coincidencia
+            } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
+                //if (prin[i-1] != sec[j-1]) {
+                    alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+                    alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
+                    i--;
+                    j--; //se disminuyen los indices de las secuencias
+                
+            //Si no se cumple ninguna de las condiciones anteriores
+            } else {
+
+                //verifica si la puntuacion proviene de un gap en la segunda secuencia
+                if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
+                alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+                alineamiento2 = '-' + alineamiento2; //agrega un gap
+                i--; //dismunuye el indice de la 1era secuencia
+            
+                //si proviene de un gap de la primera secuencia
+                } else { //gap en la primera secuencia
+                    alineamiento1 = '-' + alineamiento1; //agrega un gap
+                    alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
+                    j--; //dismunuye el indice de la 2da secuencia
+                }
             }
-        cout<<"ahora aqui, ya se hizo el primer ciclo de if"<< endl;
+        
+        //si solo hay caracteres en la primera secuencia
+        } else if (i > 0) {
+            alineamiento1 = prin[i - 1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+            alineamiento2 = '-' + alineamiento2; //agrega un gap
+            i--; //dismunuye el indice de la primera secuencia
 
-        } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
-            if (prin[i-1] != sec[j-1]) {
-                alineamiento1 = prin[i-1] + alineamiento1;
-                alineamiento2 = sec[j-1] + alineamiento2;
-                i--;
-                j--;
-            }
-        cout<<"cambio aqui, ahora en primer else if"<< endl;
-
-        } else if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
-            alineamiento1 = prin[i-1] + alineamiento1;
-            alineamiento2 = '-' + alineamiento2;
-            i--;
-        cout<<"aqui, ahora en el segundo else if"<< endl;
-
-        } else { //gap en la primera secuencia
-            alineamiento1 = '-' + alineamiento1;
-            alineamiento2 = sec[j-1] + alineamiento2;
-            j--;
+        //Si solo hay caracteres en la segunda secuencia
+        } else if (j > 0) {
+            alineamiento1 = '-' + alineamiento1; //agrega un gap
+            alineamiento2 = sec[j - 1] + alineamiento2; //agrega el caracter de la 2da secuencia
+            j--; //disminuye el indice de la segunda secuencia
         }
-        cout<<"estoy aqui, en el ultimo else"<< endl;
     }
-
-    while (i > 0) {
-        alineamiento1 = prin[i-1] + alineamiento1;
-        alineamiento2 = '-' + alineamiento2;
-        i--;
-    }
-    cout<<"estoy aqui, en el primer while"<< endl;
-
-    while (j > 0) {
-        alineamiento1 = '-' + alineamiento1;
-        alineamiento2 = sec[j - 1] + alineamiento2;
-        j--;
-    }
-    cout<<"estoy aqui, en el segundo while"<< endl;
-
+    
+    //Se imprimen los alineamientos finales
     cout << "Alineamiento1: " << alineamiento1 << endl;
     cout << "ALineamiento2: " << alineamiento2 << endl;
+    
+    //Se genera el arhivo .dot para la imagen en Graphiz
+    ofstream archivo("alineamiento.dot");
+    archivo << "digraph Alineamiento {" << endl;
+    archivo << "rankdir=TB;" << endl;
+    archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
+
+    // Crear nodos para la secuencia 1 y la secuencia 2
+    for (size_t k = 0; k < alineamiento1.size(); ++k) {
+        archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
+        archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl; // Nodo de la secuencia 2
+
+        // Conectar los nodos de la secuencia 1 y 2
+        if (alineamiento1[k] != '-' && alineamiento2[k] != '-') {
+            archivo << "n1_" << k << " -> n2_" << k << " [label=\"|\", fontsize=12, color=black];" << endl; // Conexión
+        }
+    }
+
+    archivo << "}" << endl;
+    archivo.close();
+
+    // Usar Graphviz para generar la imagen
+    system("dot -Tpng -o alineamiento.png alineamiento.dot");
+    system("start alineamiento.png"); // Visualizar la imagen generada en Windows
+}
+
+int main(int argc, char const *argv[]) {
+
+    /*inicializar arreglos*/
+    const int largo = 100; // tamaño máximo de las secuencias
+    char principal[largo] = {0};
+    char secundaria[largo] = {0};
+    int gap = -1; //en -2 para que no sea igual que el -1 por el mismatch de no coincidir
+    //int valorV; //puntaje para no emparejar, parametro de ejecucion *DF*
+    //int matriz[MAX_MATRIZ][MAX_MATRIZ] = {0}; matriz de emparejamiento *DF* 
+
+    //lee secuencias desde archivos
+    string archivo_principal = "secuencia1.txt";
+    string archivo_secundaria = "secuencia2.txt";
+    //string archivo_matriz = "matriz.txt" *DF*
+
+    //cargar la matriz de emparejamiento y el valor V
+    //cargar_matriz_y_valor(archivo_matriz, matriz, valorV); *DF*
+
+    //llama a la funcion para comparar las secuencias
+    //compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo, matriz, valorV);
+    compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo);
+
+    return 0;
+    
+}
+
+// Ciclo para llenar la matriz de puntuaciones:
+
+// Se recorre cada celda de la matriz, 
+//calculando el valor máximo entre las opciones de coincidencia, 
+//no coincidencia y gaps, utilizando las puntuaciones definidas.
+
+
+// Ciclo para reconstruir el alineamiento:
+// Este ciclo se ejecuta mientras haya caracteres en las secuencias. 
+//Se verifica si la puntuación actual proviene de una coincidencia, 
+//no coincidencia o un gap, y se construyen las cadenas alineadas en consecuencia.
+// Se utilizan condiciones explícitas para evitar ciclos infinitos, asegurándose de que los índices se decrementen adecuadamente.
+
 
 //     // //deberia generar la imagen
 //     // //no son las mismas lineas de codigo para windows o linux :)
@@ -185,43 +275,6 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
 //     // system("dot -Tpng alineamiento.dot -o alineamiento.png");
 //     // system("start alineamiento.png");
 //     // Generar el archivo DOT para Graphviz
-
-    ofstream archivo("alineamiento.dot");
-    archivo << "digraph Alineamiento {" << endl;
-    archivo << "rankdir=LR;" << endl;
-    archivo << "node [shape=box, style=filled, fillcolor=lightblue];" << endl;
-
-    for (size_t k = 0; k < alineamiento1.size(); ++k) {
-        archivo << "n" << k << " [label=\"" << alineamiento1[k] << "|" << alineamiento2[k] << "\"];" << endl;
-        if (k > 0) {
-            archivo << "n" << k - 1 << " -> n" << k << ";" << endl;
-        }
-    }
-
-    archivo << "}" << endl;
-    archivo.close();
-
-    // Usar Graphviz para generar la imagen
-    system("dot -Tpng -o alineamiento.png alineamiento_v2.dot");
-
-    system("start alineamiento.png"); // Visualizar la imagen generada en Windows
-}
-
-int main(int argc, char const *argv[]) {
-    /*inicializar arreglos*/
-    const int largo = 100;
-    char principal[largo] = {0};
-    char secundaria[largo] = {0};
-    int gap = -1; //en -2 para que no sea igual que el -1 por el mismatch de no coincidir
-
-    //lee secuencias desde archivos
-    string archivo_principal = "secuencia1.txt";
-    string archivo_secundaria = "secuencia2.txt";
-    compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo);
-
-    return 0;
-    
-}
 
 
 
@@ -305,3 +358,19 @@ int main(int argc, char const *argv[]) {
 //     system("dot -Tpng alineamiento.dot -o alineamiento.png");
 //     system("start alineamiento.png");
 //}
+
+
+//en el anterior ciclo:
+// while (i > 0) {
+    //     alineamiento1 = prin[i-1] + alineamiento1;
+    //     alineamiento2 = '-' + alineamiento2;
+    //     i--;
+    // }
+    // //cout<<"estoy aqui, en el primer while"<< endl;
+
+    // while (j > 0) {
+    //     alineamiento1 = '-' + alineamiento1;
+    //     alineamiento2 = sec[j - 1] + alineamiento2;
+    //     j--;
+    // }
+    //cout<<"estoy aqui, en el segundo while"<< endl;
