@@ -41,7 +41,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     validar_tamanos(m,n); // valida que los tamanos no sean 0 (osea que exista algo en el archivo)
 
     int mayor = max(m + 1, n + 1); //determina la longitud maxima
-    int matriz[1000][1000] = {0}; //se crea la matriz estatica
+    int matriz[100][100] = {0}; //se crea la matriz estatica
 
     //parametros del algoritmo
     int match = 1; //Match: Si las bases actuales son iguales "coinciden"
@@ -135,7 +135,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
                 i--;
                 j--;
             }
-        cout<<"estoy aqui, ya se hizo el primer ciclo de if"<< endl;
+        cout<<"ahora aqui, ya se hizo el primer ciclo de if"<< endl;
 
         } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
             if (prin[i-1] != sec[j-1]) {
@@ -144,13 +144,13 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
                 i--;
                 j--;
             }
-        cout<<"estoy aqui, ahora en primer else if"<< endl;
+        cout<<"cambio aqui, ahora en primer else if"<< endl;
 
         } else if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
             alineamiento1 = prin[i-1] + alineamiento1;
             alineamiento2 = '-' + alineamiento2;
             i--;
-        cout<<"estoy aqui, ahora en el segundo else if"<< endl;
+        cout<<"aqui, ahora en el segundo else if"<< endl;
 
         } else { //gap en la primera secuencia
             alineamiento1 = '-' + alineamiento1;
