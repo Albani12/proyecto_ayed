@@ -219,86 +219,30 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     
 
     mostrar_alineamiento(alineamiento1, alineamiento2, m, n);
-    //int posicion = 199; //variable de seguimiento de posicion actual 
-    //199 corresponde a la ultima posicion del arreglo y ahi comienza
 
-    // while (i > 0 || j > 0) { //Mientras hayan caracteres en alguna de las secuencias
+    //Se genera el arhivo .dot para la imagen en Graphiz
+    ofstream archivo("alineamiento.dot");
+    archivo << "digraph Alineamiento {" << endl;
+    archivo << "rankdir=TB;" << endl;
+    archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
 
-    //     if (i > 0 && j > 0) { //si hay caracteres en ambas secuencias
+    // Crear nodos para la secuencia 1 y la secuencia 2
+    for (size_t k = 0; k < n + m + 1; ++k) {
+        archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
+        archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl; // Nodo de la secuencia 2
 
-    //         //verifica si la puntuacion proviene de una coincidencia 
-    //         if (matriz[i][j] == matriz[i-1][j-1] + match) { //coincidencia
-    //                 alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-    //                 alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
-    //                 i--;
-    //                 j--; //se disminuyen los indices de las secuencias
+        // Conectar los nodos de la secuencia 1 y 2
+        if (alineamiento1[k] != '-' && alineamiento2[k] != '-') {
+            archivo << "n1_" << k << " -> n2_" << k << " [label=\"|\", fontsize=12, color=black];" << endl; // Conexión
+        }
+    }
 
-    //         //Verifica si la puntuacion proviene de una no coincidencia
-    //         } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
-    //             //if (prin[i-1] != sec[j-1]) {
-    //                 alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-    //                 alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
-    //                 i--;
-    //                 j--; //se disminuyen los indices de las secuencias
-                
-    //         //Si no se cumple ninguna de las condiciones anteriores
-    //         } else {
+    archivo << "}" << endl;
+    archivo.close();
 
-    //             //verifica si la puntuacion proviene de un gap en la segunda secuencia
-    //             if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
-    //             alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-    //             alineamiento2 = '-' + alineamiento2; //agrega un gap
-    //             i--; //dismunuye el indice de la 1era secuencia
-            
-    //             //si proviene de un gap de la primera secuencia
-    //             } else { //gap en la primera secuencia
-    //                 alineamiento1 = '-' + alineamiento1; //agrega un gap
-    //                 alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
-    //                 j--; //dismunuye el indice de la 2da secuencia
-    //             }
-    //         }
-        
-    //     //si solo hay caracteres en la primera secuencia
-    //     } else if (i > 0) {
-    //         alineamiento1 = prin[i - 1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-    //         alineamiento2 = '-' + alineamiento2; //agrega un gap
-    //         i--; //dismunuye el indice de la primera secuencia
-
-    //     //Si solo hay caracteres en la segunda secuencia
-    //     } else if (j > 0) {
-    //         alineamiento1 = '-' + alineamiento1; //agrega un gap
-    //         alineamiento2 = sec[j - 1] + alineamiento2; //agrega el caracter de la 2da secuencia
-    //         j--; //disminuye el indice de la segunda secuencia
-    //     }
-    // }
-    
-    //Se imprimen los alineamientos finales
-    // cout << "Alineamiento1: " << alineamiento1 << endl;
-    // cout << "ALineamiento2: " << alineamiento2 << endl;
-    
-    // //Se genera el arhivo .dot para la imagen en Graphiz
-    // ofstream archivo("alineamiento.dot");
-    // archivo << "digraph Alineamiento {" << endl;
-    // archivo << "rankdir=TB;" << endl;
-    // archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
-
-    // // Crear nodos para la secuencia 1 y la secuencia 2
-    // for (size_t k = 0; k < alineamiento1.size(); ++k) {
-    //     archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
-    //     archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl; // Nodo de la secuencia 2
-
-    //     // Conectar los nodos de la secuencia 1 y 2
-    //     if (alineamiento1[k] != '-' && alineamiento2[k] != '-') {
-    //         archivo << "n1_" << k << " -> n2_" << k << " [label=\"|\", fontsize=12, color=black];" << endl; // Conexión
-    //     }
-    // }
-
-    // archivo << "}" << endl;
-    // archivo.close();
-
-    // // Usar Graphviz para generar la imagen
-    // system("dot -Tpng -o alineamiento.png alineamiento.dot");
-    // system("start alineamiento.png"); // Visualizar la imagen generada en Windows
+    // Usar Graphviz para generar la imagen
+    system("dot -Tpng -o alineamiento.png alineamiento.dot");
+    system("start alineamiento.png"); // Visualizar la imagen generada en Windows
 }
 
 int main(int argc, char const *argv[]) {
