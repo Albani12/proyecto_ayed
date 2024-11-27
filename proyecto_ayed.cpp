@@ -45,7 +45,6 @@ void cargar_matriz_y_valor(const string archivo_matriz, int matriz[MAX_MATRIZ][M
             }
         }
         file.close();
-        cout << matriz[0][0] << endl;
         
     } else {
         cerr << "Error al abrir el archivo de matriz." << endl;
