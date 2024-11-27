@@ -31,14 +31,11 @@ int abrir_y_leer_archivo(char *arr, string nombre_archivo, int largo){
 }
 
 //Función para cargar la matriz de emparejamiento y el valor V *DF*
-void cargar_matriz_y_valor(const string archivo_matriz, int matriz[MAX_MATRIZ][MAX_MATRIZ], int &valorV) {
+void cargar_matriz_y_valor(const string archivo_matriz, int matriz[MAX_MATRIZ][MAX_MATRIZ]) {
     ifstream file(archivo_matriz);
 
     if (file.is_open()) {
-        // Leer el valor V
-        file >> valorV;
-
-        // Leer la matriz
+         // Leer la matriz
         for (int i = 0; i < MAX_MATRIZ; i++) {
             for (int j = 0; j < MAX_MATRIZ; j++) {
                 file >> matriz[i][j];
@@ -48,6 +45,8 @@ void cargar_matriz_y_valor(const string archivo_matriz, int matriz[MAX_MATRIZ][M
             }
         }
         file.close();
+        cout << matriz[0][0] << endl;
+        
     } else {
         cerr << "Error al abrir el archivo de matriz." << endl;
     }
@@ -104,7 +103,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
 
     //Parámetros del algoritmo, se leen desde la matriz que va de parámetro de entrada
     int match = matriz[0][0]; //Match: Si las bases actuales son iguales "coinciden"
-    int mismatch = matriz[1][1]; //Mismatch: Si las bases son diferentes "no coinciden"
+    int mismatch = matriz[1][2]; //Mismatch: Si las bases son diferentes "no coinciden"
     int gap = valorV;
 
 
@@ -267,7 +266,7 @@ int main(int argc, char const *argv[]) {
     char principal[MAX_LARGO];
     char secundaria[MAX_LARGO];
     int matriz[MAX_MATRIZ][MAX_MATRIZ];
-    int valorV = 0; // Inicializar el valor de penalización, puntaje de no emparejar
+    int valorV; // Inicializar el valor de penalización, puntaje de no emparejar
 
     // Leer los parámetros de entrada
     string archivo_principal, archivo_secundaria, archivo_matriz;
@@ -289,7 +288,7 @@ int main(int argc, char const *argv[]) {
     abrir_y_leer_archivo(principal, archivo_principal, MAX_LARGO);
     abrir_y_leer_archivo(secundaria, archivo_secundaria, MAX_LARGO);
     // Cargar la matriz de emparejamiento
-    cargar_matriz_y_valor(archivo_matriz, matriz, valorV);
+    cargar_matriz_y_valor(archivo_matriz, matriz);
     // Llamar a la función para comparar las secuencias
     int gap = valorV; // Usar el valor de penalización como gap
     compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, MAX_LARGO, matriz); 
