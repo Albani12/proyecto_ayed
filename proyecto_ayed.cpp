@@ -7,7 +7,7 @@
 //si se dejan ahora en cada ejecucion hay que poner los parametros y es mas tedioso
 
 using namespace std;
-const int MAX_LARGO = 100; //tamaño maximo de secuencias
+const int MAX_LARGO = 1000; //tamaño maximo de secuencias
 const int MAX_MATRIZ = 4;   // tamaño máximo de la matriz para A, T, C, G
 
 /*abrir archivos y crear arreglos*/
@@ -39,9 +39,7 @@ void cargar_matriz_y_valor(const string archivo_matriz, int matriz[MAX_MATRIZ][M
         for (int i = 0; i < MAX_MATRIZ; i++) {
             for (int j = 0; j < MAX_MATRIZ; j++) {
                 file >> matriz[i][j];
-                // if (!(file >> matriz[i][j])) {
-                //     matriz[i][j] = 0; // Asignar 0 si no se puede leer más
-                // }
+
             }
         }
         file.close();
@@ -95,10 +93,9 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     validar_tamanos(m,n); // valida que los tamanos no sean 0 (osea que exista algo en el archivo)
 
     
-    //int matriz[MAX_LARGO+1][MAX_LARGO+1] = {0}; //se crea la matriz estatica
     //se crea la matriz estatica para almacenar las puntuaciones
     //le puse matrix porque matriz se llama la del parametro
-    int matrix[100][100] = {0}; 
+    int matrix[MAX_LARGO][MAX_LARGO] = {0}; 
 
     //Parámetros del algoritmo, se leen desde la matriz que va de parámetro de entrada
     int match = matriz[0][0]; //Match: Si las bases actuales son iguales "coinciden"
@@ -163,17 +160,6 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     cout << endl;
 
     cout<<"A continuacion se muestran los alineamientos:"<< endl;
-
-    //RECONSTRUCCION DEL ALINEAMIENTO
-
-    //     for (int i = 0; i <= m; i++) {
-    //     for (int j = 0; j <= n; j++) {
-    //         cout << matriz [i][j]<< "    ";
-    //     }
-    //     cout << "\n";
-    //     cout << "  " << prin[i] << "  ";
-    // }
-    // cout << endl;
 
     //RECONSTRUCCION DEL ALINEAMIENTO
 
@@ -292,146 +278,6 @@ int main(int argc, char const *argv[]) {
     int gap = valorV; // Usar el valor de penalización como gap
     compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, MAX_LARGO, matriz); 
 
-
-
-    // /*inicializar arreglos*/
-    // const int largo = 100; // tamaño máximo de las secuencias
-    // char principal[largo] = {0};
-    // char secundaria[largo] = {0};
-    // int gap = -1; //en -2 para que no sea igual que el -1 por el mismatch de no coincidir
-    // //int valorV; //puntaje para no emparejar, parametro de ejecucion *DF*
-    // //int matriz[MAX_MATRIZ][MAX_MATRIZ] = {0}; matriz de emparejamiento *DF* 
-
-    // //lee secuencias desde archivos
-    // string archivo_principal = "secuencia1.txt";
-    // string archivo_secundaria = "secuencia2.txt";
-
-    //llama a la funcion para comparar las secuencias
-    //compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo, matriz, valorV);
-    //compara_bases(principal, secundaria, archivo_principal, archivo_secundaria, gap, largo);
-
     return 0;
     
 }
-
-// Ciclo para llenar la matriz de puntuaciones:
-
-// Se recorre cada celda de la matriz, 
-//calculando el valor máximo entre las opciones de coincidencia, 
-//no coincidencia y gaps, utilizando las puntuaciones definidas.
-
-
-// Ciclo para reconstruir el alineamiento:
-// Este ciclo se ejecuta mientras haya caracteres en las secuencias. 
-//Se verifica si la puntuación actual proviene de una coincidencia, 
-//no coincidencia o un gap, y se construyen las cadenas alineadas en consecuencia.
-// Se utilizan condiciones explícitas para evitar ciclos infinitos, asegurándose de que los índices se decrementen adecuadamente.
-
-
-//     // //deberia generar la imagen
-//     // //no son las mismas lineas de codigo para windows o linux :)
-//     // //generacion de la imagen con graphviz
-//     // archivo_dot << "}" << endl; //cierra el grafo DOT
-//     // archivo_dot.close(); //cierra el archivo DOT
-//     // system("dot -Tpng alineamiento.dot -o alineamiento.png");
-//     // system("start alineamiento.png");
-//     // Generar el archivo DOT para Graphviz
-
-
-
-
-// void alinear(char* prin, char* sec, int m, int n, int** matriz, int match, int mismatch, int gap){
-//     char alineamiento1[m + n + 1]; //secuencia1 alineada
-//     char alineamiento2[m + n + 1]; //secuencia2 alineada
-
-//     //ahora la reconstruccion del alineamiento desde la matriz
-//     int posicion = n + m + 1; //variable de seguimiento de posicion actual. Corresponde a la ultima posicion del arreglo y ahi comienza
-//     // se compara la matriz para el alineamiento
-//     int i = m;
-//     int j = n;
-//     int h = max(m,n);
-
-//     while (i > 0 || j > 0)
-//     {
-//         if (matriz[i + 1][j + 1] == matriz[i-1][j-1] + match) { //coincidencia
-//             if (prin[i-1] == sec[j-1]) {
-//                 alineamiento1[h] = prin[i-1] + alineamiento1;
-//                 alineamiento2[h] = sec[j-1] + alineamiento2;
-//                 i--;
-//                 j--;
-//             }
-
-//         } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
-//             if (prin[i-1] != sec[j-1]) {
-//                 alineamiento1[h] = prin[i-1] + alineamiento1;
-//                 alineamiento2[h] = sec[j-1] + alineamiento2;
-//                 i--;
-//                 j--;
-//             }
-
-//         } else if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
-//             alineamiento1[h] = prin[i-1] + alineamiento1;
-//             alineamiento2[h] = '-' + alineamiento2;
-//             i--;
-
-//         } else { //gap en la primera secuencia
-//             alineamiento1[h] = '-' + alineamiento1;
-//             alineamiento2[h] = sec[j-1] + alineamiento2;
-//             j--;
-//         }
-//         h--
-//     }
-    
-
-// }
-
-
-
-//     
-
-//     int i = m;
-//     int j = n;
-//     //para generar la imagen en graphiz
-//     ofstream archivo_dot("alineamiento.dot");
-//     archivo_dot << "digraph Alineamiento {" << endl;
-//     archivo_dot << "rankdir=LR;" << endl;
-//     int nodo_id = 0;
-
-//     //se compara la matriz para el alineamiento
-
-//     while (i > 0) {
-//         alineamiento1 = prin[i-1] + alineamiento1;
-//         alineamiento2 = '-' + alineamiento2;
-//         i--;
-//     }
-
-//     while (j > 0) {
-//         alineamiento1 = '-' + alineamiento1;
-//         alineamiento2 = sec[j - 1] + alineamiento2;
-//         j--;
-//     }
-
-//     cout << "Alineamiento1: " << alineamiento1 << endl;
-//     cout << "ALineamiento2: " << alineamiento2 << endl;
-
-//     //deberia generar la imagen
-//     //no son las mismas lineas de codigo para windows o linux :)
-//     system("dot -Tpng alineamiento.dot -o alineamiento.png");
-//     system("start alineamiento.png");
-//}
-
-
-//en el anterior ciclo:
-// while (i > 0) {
-    //     alineamiento1 = prin[i-1] + alineamiento1;
-    //     alineamiento2 = '-' + alineamiento2;
-    //     i--;
-    // }
-    // //cout<<"estoy aqui, en el primer while"<< endl;
-
-    // while (j > 0) {
-    //     alineamiento1 = '-' + alineamiento1;
-    //     alineamiento2 = sec[j - 1] + alineamiento2;
-    //     j--;
-    // }
-    //cout<<"estoy aqui, en el segundo while"<< endl;
