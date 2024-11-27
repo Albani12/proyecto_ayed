@@ -63,6 +63,30 @@ void validar_tamanos(int m, int n){
     }    
 }
 
+void mostrar_alineamiento(char *alineamiento1, char *alineamiento2, int m, int n){
+    for (int i = 0; i <= m + n + 1; i++)
+    {
+        if (alineamiento1 != 0)
+        {
+            cout << " " << alineamiento1[i] << " ";
+        }
+        
+    }
+    cout << endl;
+
+    for (int i = 0; i <= m + n + 1; i++)
+    {
+        if (alineamiento2 != 0)
+        {
+            cout << " " << alineamiento2[i] << " ";
+        }
+        
+        
+    }
+    cout << endl;
+    
+}
+
 //Funcion principal que implementa el algoritmo de Needleman-Wunsch
 void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_archivo, int gap, int largo){
     //leer las secuencias desde los archivos
@@ -139,92 +163,142 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
 
     //RECONSTRUCCION DEL ALINEAMIENTO
 
-    string alineamiento1 = ""; //secuencia1 alineada
-    string alineamiento2 = ""; //secuencia2 alineada
+        for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= n; j++) {
+            cout << matriz [i][j]<< "    ";
+        }
+        cout << "\n";
+        cout << "  " << prin[i] << "  ";
+    }
+    cout << endl;
 
-    int i = m;
-    int j = n;
+    //RECONSTRUCCION DEL ALINEAMIENTO
 
+    char alineamiento1[n + m + 1] = {0}; //arreglo para alinear la secuencia
+    char alineamiento2[n + m + 1] = {0}; //arreglo para alinear la secuencia
+    //ahora la reconstruccion del alineamiento desde la matriz
+    int posicion = n + m + 1; //variable de seguimiento de posicion actual. Corresponde a la ultima posicion del arreglo y ahi comienza
+    // se compara la matriz para el alineamiento
+    int i = n + 2;
+    int j = m + 2;
+
+    while (j > 0 || i > 0)
+    {
+        int arriba = matriz[i-1][j];
+        int izq = matriz[i][j-1];
+        int diagonal = matriz[i-1][j-1];
+        if (diagonal >= arriba && diagonal >= izq )
+        {
+            alineamiento1[posicion] = prin[i-1];
+            alineamiento2[posicion] = sec[j-1];
+            j--;
+            i--;
+        }
+        else if (arriba > diagonal && arriba >= izq )
+        {
+
+            alineamiento1[posicion] = prin[i-1];
+            alineamiento2[posicion] = '-';
+            i--;
+        }
+        else if (izq > diagonal && izq > arriba)
+        {
+            alineamiento1[posicion] = '-';
+            alineamiento2[posicion] =  sec[j-1];
+            j--;
+        }
+        else
+        {
+            cout << "algo no funciona" << endl;
+        }
+        
+
+        posicion--;
+        
+    }
+    
+
+    mostrar_alineamiento(alineamiento1, alineamiento2, m, n);
     //int posicion = 199; //variable de seguimiento de posicion actual 
     //199 corresponde a la ultima posicion del arreglo y ahi comienza
 
-    while (i > 0 || j > 0) { //Mientras hayan caracteres en alguna de las secuencias
+    // while (i > 0 || j > 0) { //Mientras hayan caracteres en alguna de las secuencias
 
-        if (i > 0 && j > 0) { //si hay caracteres en ambas secuencias
+    //     if (i > 0 && j > 0) { //si hay caracteres en ambas secuencias
 
-            //verifica si la puntuacion proviene de una coincidencia 
-            if (matriz[i][j] == matriz[i-1][j-1] + match) { //coincidencia
-                    alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-                    alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
-                    i--;
-                    j--; //se disminuyen los indices de las secuencias
+    //         //verifica si la puntuacion proviene de una coincidencia 
+    //         if (matriz[i][j] == matriz[i-1][j-1] + match) { //coincidencia
+    //                 alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+    //                 alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
+    //                 i--;
+    //                 j--; //se disminuyen los indices de las secuencias
 
-            //Verifica si la puntuacion proviene de una no coincidencia
-            } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
-                //if (prin[i-1] != sec[j-1]) {
-                    alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-                    alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
-                    i--;
-                    j--; //se disminuyen los indices de las secuencias
+    //         //Verifica si la puntuacion proviene de una no coincidencia
+    //         } else if (matriz[i][j] == matriz [i-1][j-1] + mismatch) { //no coinciden
+    //             //if (prin[i-1] != sec[j-1]) {
+    //                 alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+    //                 alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
+    //                 i--;
+    //                 j--; //se disminuyen los indices de las secuencias
                 
-            //Si no se cumple ninguna de las condiciones anteriores
-            } else {
+    //         //Si no se cumple ninguna de las condiciones anteriores
+    //         } else {
 
-                //verifica si la puntuacion proviene de un gap en la segunda secuencia
-                if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
-                alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-                alineamiento2 = '-' + alineamiento2; //agrega un gap
-                i--; //dismunuye el indice de la 1era secuencia
+    //             //verifica si la puntuacion proviene de un gap en la segunda secuencia
+    //             if (matriz[i][j] == matriz[i-1][j] + gap) { //gap en la segunda secuencia
+    //             alineamiento1 = prin[i-1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+    //             alineamiento2 = '-' + alineamiento2; //agrega un gap
+    //             i--; //dismunuye el indice de la 1era secuencia
             
-                //si proviene de un gap de la primera secuencia
-                } else { //gap en la primera secuencia
-                    alineamiento1 = '-' + alineamiento1; //agrega un gap
-                    alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
-                    j--; //dismunuye el indice de la 2da secuencia
-                }
-            }
+    //             //si proviene de un gap de la primera secuencia
+    //             } else { //gap en la primera secuencia
+    //                 alineamiento1 = '-' + alineamiento1; //agrega un gap
+    //                 alineamiento2 = sec[j-1] + alineamiento2; //agrega el caracter de la 2da secuencia
+    //                 j--; //dismunuye el indice de la 2da secuencia
+    //             }
+    //         }
         
-        //si solo hay caracteres en la primera secuencia
-        } else if (i > 0) {
-            alineamiento1 = prin[i - 1] + alineamiento1; //agrega el caracter de la 1ra secuencia
-            alineamiento2 = '-' + alineamiento2; //agrega un gap
-            i--; //dismunuye el indice de la primera secuencia
+    //     //si solo hay caracteres en la primera secuencia
+    //     } else if (i > 0) {
+    //         alineamiento1 = prin[i - 1] + alineamiento1; //agrega el caracter de la 1ra secuencia
+    //         alineamiento2 = '-' + alineamiento2; //agrega un gap
+    //         i--; //dismunuye el indice de la primera secuencia
 
-        //Si solo hay caracteres en la segunda secuencia
-        } else if (j > 0) {
-            alineamiento1 = '-' + alineamiento1; //agrega un gap
-            alineamiento2 = sec[j - 1] + alineamiento2; //agrega el caracter de la 2da secuencia
-            j--; //disminuye el indice de la segunda secuencia
-        }
-    }
+    //     //Si solo hay caracteres en la segunda secuencia
+    //     } else if (j > 0) {
+    //         alineamiento1 = '-' + alineamiento1; //agrega un gap
+    //         alineamiento2 = sec[j - 1] + alineamiento2; //agrega el caracter de la 2da secuencia
+    //         j--; //disminuye el indice de la segunda secuencia
+    //     }
+    // }
     
     //Se imprimen los alineamientos finales
-    cout << "Alineamiento1: " << alineamiento1 << endl;
-    cout << "ALineamiento2: " << alineamiento2 << endl;
+    // cout << "Alineamiento1: " << alineamiento1 << endl;
+    // cout << "ALineamiento2: " << alineamiento2 << endl;
     
-    //Se genera el arhivo .dot para la imagen en Graphiz
-    ofstream archivo("alineamiento.dot");
-    archivo << "digraph Alineamiento {" << endl;
-    archivo << "rankdir=TB;" << endl;
-    archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
+    // //Se genera el arhivo .dot para la imagen en Graphiz
+    // ofstream archivo("alineamiento.dot");
+    // archivo << "digraph Alineamiento {" << endl;
+    // archivo << "rankdir=TB;" << endl;
+    // archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
 
-    // Crear nodos para la secuencia 1 y la secuencia 2
-    for (size_t k = 0; k < alineamiento1.size(); ++k) {
-        archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
-        archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl; // Nodo de la secuencia 2
+    // // Crear nodos para la secuencia 1 y la secuencia 2
+    // for (size_t k = 0; k < alineamiento1.size(); ++k) {
+    //     archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
+    //     archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl; // Nodo de la secuencia 2
 
-        // Conectar los nodos de la secuencia 1 y 2
-        if (alineamiento1[k] != '-' && alineamiento2[k] != '-') {
-            archivo << "n1_" << k << " -> n2_" << k << " [label=\"|\", fontsize=12, color=black];" << endl; // Conexión
-        }
-    }
+    //     // Conectar los nodos de la secuencia 1 y 2
+    //     if (alineamiento1[k] != '-' && alineamiento2[k] != '-') {
+    //         archivo << "n1_" << k << " -> n2_" << k << " [label=\"|\", fontsize=12, color=black];" << endl; // Conexión
+    //     }
+    // }
 
-    archivo << "}" << endl;
-    archivo.close();
+    // archivo << "}" << endl;
+    // archivo.close();
 
-    // Usar Graphviz para generar la imagen
-    system("dot -Tpng -o alineamiento.png alineamiento.dot");
-    system("start alineamiento.png"); // Visualizar la imagen generada en Windows
+    // // Usar Graphviz para generar la imagen
+    // system("dot -Tpng -o alineamiento.png alineamiento.dot");
+    // system("start alineamiento.png"); // Visualizar la imagen generada en Windows
 }
 
 int main(int argc, char const *argv[]) {
