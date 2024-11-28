@@ -3,8 +3,6 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
-//lo que tenga *DF* significa Descomentarlo al Final, es para que se agreguen los archivos de matriz y valor de penalidad
-//si se dejan ahora en cada ejecucion hay que poner los parametros y es mas tedioso
 
 using namespace std;
 const int MAX_LARGO = 1000; //tamaño maximo de secuencias
