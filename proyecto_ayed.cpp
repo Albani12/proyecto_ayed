@@ -231,6 +231,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
         if (alineamiento2[k] != 0)
         {
             archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl;
+            archivo << "{ rank=same; n1_" << k << "; n2_" << k << "; }" << endl;
         }
         
          /// Nodo de la secuencia 2
