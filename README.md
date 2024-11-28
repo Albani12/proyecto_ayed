@@ -4,7 +4,7 @@ Alineador de secuencias
 Este programa está destinado a alinear secuencias de ADN según el algoritmo Needleman-Wunsch. El programa muestra la matriz resultante de acuerdo con el valor de penalización utilizado.
 Advertencias:
 Este programa admite un total de máximo 1000 caracteres.
-Uso exclusivo para Windows.
+Uso exclusivo para linux.
 ## Instalación
 1. Clona este repositorio:
    ```bash

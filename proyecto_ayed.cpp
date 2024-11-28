@@ -219,34 +219,52 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
 
     //Se genera el arhivo .dot para la imagen en Graphiz
     ofstream archivo("alineamiento.dot");
-    archivo << "graph Alineamiento {" << endl;
-    archivo << "rankdir=TB;" << endl;
-    archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
+    archivo << "graph Alineamiento {" << endl;  
 
+    archivo << "orientation=L;" << endl; // Orientación de arriba hacia abajo
+    archivo << "node [shape=box, style=filled, fillcolor=pink];" << endl;
+    
     // Crear nodos para la secuencia 1 y la secuencia 2
     for ( size_t k = 0; k < n + m + 1; ++k) {
-        archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
-        archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl; // Nodo de la secuencia 2
+        if (alineamiento1[k] !=0)
+        {
+            archivo << "n1_" << k << " [label=\"" << alineamiento1[k] << "\"];" << endl; // Nodo de la secuencia 1
+        }
+        if (alineamiento2[k] != 0)
+        {
+            archivo << "n2_" << k << " [label=\"" << alineamiento2[k] << "\"];" << endl;
+        }
+        
+         /// Nodo de la secuencia 2
 
         // Conectar los nodos de la secuencia 1 y 2
             // Conexión entre n1_k y n2_k si ambos son iguales y no son '-'
-        if (alineamiento1[k] != '-' && alineamiento2[k] != '-' && alineamiento1[k] == alineamiento2[k]) {
-            archivo << "n1_" << k << " -- n2_" << k << " [color=black];" << endl;
+        if (alineamiento1[k] != '-' && alineamiento2[k] != '-' && alineamiento1[k] != 0 && alineamiento2[k] != 0 )// && alineamiento1[k] == alineamiento2[k]) 
+        {
+            archivo << "n1_" << k << " -- n2_" << k << " [color=blue];" << endl;
+        }
+        else if (alineamiento1[k] == '-' || alineamiento2[k] == '-' && alineamiento1[k] != 0 && alineamiento2[k] != 0) {
+            archivo << "n1_" << k << " -- n2_" << k << " [color=red, style=dashed];" << endl; // Gap
         }
 
         // Conexiones adyacentes dentro de la secuencia 1 (siempre y cuando no se pase del límite)
-        if (k < n + m) {
-            archivo << "n1_" << k << " -- n1_" << k + 1 << " [color=gray, style=dashed];" << endl;
-            archivo << "n2_" << k << " -- n2_" << k + 1 << " [color=gray, style=dashed];" << endl;
+        if (alineamiento1[k] != 0 && alineamiento2[k] != 0)
+        {
+            
+            if (k < n + m) {
+                archivo << "n1_" << k << " -- n1_" << k + 1 << " [color=gray, style=dashed];" << endl;
+                archivo << "n2_" << k << " -- n2_" << k + 1 << " [color=gray, style=dashed];" << endl;
+            }
+            /* code */
         }
     }
 
     archivo << "}" << endl;
     archivo.close();
-
+    
     // Usar Graphviz para generar la imagen
-    system("dot -Tpng -o alineamiento.png alineamiento.dot");
-    system("start alineamiento.png"); // Visualizar la imagen generada en Windows
+    //system("dot -Tpng -o alineamiento.png alineamiento.dot");
+    //system("start alineamiento.png"); // Visualizar la imagen generada en Windows
 }
 
 int main(int argc, char const *argv[]) {
