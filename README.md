@@ -19,6 +19,10 @@ Asegúrate de tener un archivo .txt con el siguiente formato.
 -1  1 -1
 -1 -1  1
 Las secuencias deben estar en formato .txt sin información adicional y en archivos separados.
+Para generar la imagen usa:
+
+dot -Tpng alineamiento.dot -o alineamiento.png
+
 Ejemplo de uso:
 ./a.out -C1 secuencia2.txt -C2 secuencia1.txt -U matriz.txt -V -1
 El programa permite ver la matriz con las secuencias y sus puntajes. Además, se mostrará el alineamiento y el mayor puntaje.
