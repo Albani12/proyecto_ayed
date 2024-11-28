@@ -170,6 +170,8 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
     // se compara la matriz para el alineamiento
     int i = n + 2;
     int j = m + 2;
+    int puntaje_final = matrix[i-1][j-1];
+    
 
     while (j > 0 || i > 0)
     {
@@ -180,21 +182,27 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
         {
             alineamiento1[posicion] = prin[i-1];
             alineamiento2[posicion] = sec[j-1];
+            puntaje_final = puntaje_final + matrix[i-1][j-1];
             j--;
             i--;
+            
         }
         else if (arriba > diagonal && arriba >= izq )
         {
 
             alineamiento1[posicion] = prin[i-1];
             alineamiento2[posicion] = '-';
+            puntaje_final = puntaje_final + matrix[i-1][j];
             i--;
+            
         }
         else if (izq > diagonal && izq > arriba)
         {
             alineamiento1[posicion] = '-';
             alineamiento2[posicion] =  sec[j-1];
+            puntaje_final = puntaje_final + matrix[i][j-1];
             j--;
+            
         }
         else
         {
@@ -205,7 +213,7 @@ void compara_bases(char *prin, char *sec, string primer_archivo, string segundo_
         posicion--;
         
     }
-    
+    cout << "puntaje final: " << puntaje_final << endl;
 
     mostrar_alineamiento(alineamiento1, alineamiento2, m, n);
 
